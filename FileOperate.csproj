@@ -41,19 +41,19 @@
   <ItemGroup>
     <Reference Include="ICSharpCode.SharpZipLib, Version=0.85.1.271, Culture=neutral, PublicKeyToken=1b03e6acf1164f73, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>E:\CodeChingy\框架\NPOI\NPOI 2.1.1 binary\NPOI 2.1.1\dotnet2\ICSharpCode.SharpZipLib.dll</HintPath>
+      <HintPath>E:\百度云同步盘\CodeChingy\框架\NPOI\NPOI 2.1.1 binary\NPOI 2.1.1\dotnet2\ICSharpCode.SharpZipLib.dll</HintPath>
     </Reference>
     <Reference Include="NPOI">
-      <HintPath>E:\CodeChingy\框架\NPOI\NPOI 2.1.1 binary\NPOI 2.1.1\dotnet2\NPOI.dll</HintPath>
+      <HintPath>E:\百度云同步盘\CodeChingy\框架\NPOI\NPOI 2.1.1 binary\NPOI 2.1.1\dotnet2\NPOI.dll</HintPath>
     </Reference>
     <Reference Include="NPOI.OOXML">
-      <HintPath>E:\CodeChingy\框架\NPOI\NPOI 2.1.1 binary\NPOI 2.1.1\dotnet2\NPOI.OOXML.dll</HintPath>
+      <HintPath>E:\百度云同步盘\CodeChingy\框架\NPOI\NPOI 2.1.1 binary\NPOI 2.1.1\dotnet2\NPOI.OOXML.dll</HintPath>
     </Reference>
     <Reference Include="NPOI.OpenXml4Net">
-      <HintPath>E:\CodeChingy\框架\NPOI\NPOI 2.1.1 binary\NPOI 2.1.1\dotnet2\NPOI.OpenXml4Net.dll</HintPath>
+      <HintPath>E:\百度云同步盘\CodeChingy\框架\NPOI\NPOI 2.1.1 binary\NPOI 2.1.1\dotnet2\NPOI.OpenXml4Net.dll</HintPath>
     </Reference>
     <Reference Include="NPOI.OpenXmlFormats">
-      <HintPath>E:\CodeChingy\框架\NPOI\NPOI 2.1.1 binary\NPOI 2.1.1\dotnet2\NPOI.OpenXmlFormats.dll</HintPath>
+      <HintPath>E:\百度云同步盘\CodeChingy\框架\NPOI\NPOI 2.1.1 binary\NPOI 2.1.1\dotnet2\NPOI.OpenXmlFormats.dll</HintPath>
     </Reference>
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="System.Web.DynamicData" />

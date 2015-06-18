@@ -15,7 +15,8 @@ namespace FileOperate.Excel
     public interface IExcelOperate
     {
         IWorkbook DtToWorkBook(DataTable dt);
-        IWorkbook DsToWorkBook(DataSet ds);
+        IWorkbook DtToWorkBook(DataTable dt, FileType fileType);
+        IWorkbook DsToWorkBook(DataSet ds, FileType fileType);
         ISheet DtToISheet(ref ISheet sheet, DataTable dt);
         /// <summary>
         /// 将DataTable转为NPOI工作簿
@@ -25,7 +26,7 @@ namespace FileOperate.Excel
         /// <returns></returns>
         ISheet DtToISheet(ref ISheet sheet, DataTable dt, bool flagFormat);
 
-        IWorkbook GvToWorkBook(GridView gv);
+        IWorkbook GvToWorkBook(GridView gv, FileType fileType);
         ISheet GvToISheet(ref ISheet sheet, GridView gv);
 
         DataTable DtFromSheet(ISheet sheet, int HeaderRowIndex, bool needHeader, out string ImportMessage);

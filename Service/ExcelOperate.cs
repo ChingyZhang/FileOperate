@@ -1,4 +1,5 @@
-﻿using NPOI.SS.Formula.Eval;
+﻿using NPOI.HSSF.UserModel;
+using NPOI.SS.Formula.Eval;
 using NPOI.SS.UserModel;
 using NPOI.XSSF.UserModel;
 using System;
@@ -11,26 +12,37 @@ using System.Web.UI.WebControls;
 
 namespace FileOperate.Excel
 {
+    public enum FileType : int
+    {
+        Excel2003 = 1,
+        Excel2007 = 2
+    }
 
     /// <summary>
     /// 利用NPOI对Excel进行导入导出操作（dll类库为NPOI 2.1.1）
-    /// 导出Excel格式为2007，导入时不区分2003和2007版本
+    /// FileType：1： Excel2003版本；2：Excel2007版本
+    /// 导出Excel格式默认为2007，导入时不区分2003和2007版本
     /// </summary>
     public class ExcelOperate : IExcelOperate
     {
 
         public IWorkbook DtToWorkBook(DataTable dt)
         {
-            IWorkbook IWorkbook = new XSSFWorkbook();
+            return DtToWorkBook(dt, FileType.Excel2007);
+        }
+
+        public IWorkbook DtToWorkBook(DataTable dt, FileType fileType)
+        {
+            IWorkbook IWorkbook = GetWorkBook(fileType);
             string _strSheetName = string.IsNullOrEmpty(dt.TableName) ? "Sheet1" : dt.TableName;
             ISheet sheet = IWorkbook.CreateSheet(_strSheetName);
             DtToISheet(ref sheet, dt);
             return IWorkbook;
         }
 
-        public IWorkbook DsToWorkBook(DataSet ds)
+        public IWorkbook DsToWorkBook(DataSet ds, FileType fileType)
         {
-            IWorkbook IWorkbook = new XSSFWorkbook();
+            IWorkbook IWorkbook = GetWorkBook(fileType);
             ISheet sheet;
             for (int i = 0; i < ds.Tables.Count; i++)
             {
@@ -48,12 +60,28 @@ namespace FileOperate.Excel
             return IWorkbook;
         }
 
-        public IWorkbook GvToWorkBook(GridView gv)
+        public IWorkbook GvToWorkBook(GridView gv, FileType fileType)
         {
-            IWorkbook hssfworkbook = new XSSFWorkbook();
+            IWorkbook hssfworkbook = GetWorkBook(fileType);
             ISheet sheet = hssfworkbook.CreateSheet("sheet1");
             GvToISheet(ref sheet, gv);
             return hssfworkbook;
+        }
+
+        /// <summary>
+        /// 获取IWorkBook版本
+        /// </summary>
+        /// <param name="iFileType">1： Excel2003版本；2：Excel2007版本</param>
+        /// <returns></returns>
+        private IWorkbook GetWorkBook(FileType fileType)
+        {
+            IWorkbook IWorkbook;
+            if (fileType == FileType.Excel2003)
+            {
+                IWorkbook = new HSSFWorkbook();
+            }
+            IWorkbook = new XSSFWorkbook();
+            return IWorkbook;
         }
 
         #region DataTable导出为ISheet
@@ -723,7 +751,7 @@ namespace FileOperate.Excel
 
             string _suffix = filePath.Substring(filePath.LastIndexOf('.'), filePath.Length - filePath.LastIndexOf('.'));
 
-            if (_suffix != ".xlsx") filePath += ".xlsx";
+            if (string.IsNullOrEmpty(_suffix)) filePath += ".xlsx";
             try
             {
                 FileStream fs = File.Create(filePath);
@@ -823,18 +851,13 @@ namespace FileOperate.Excel
                                 {
                                     switch (row.GetCell(j).CellType)
                                     {
-                                        case CellType.String:
-                                            string str = row.GetCell(j).StringCellValue.Trim();
-                                            if (str != null && str.Length > 0)
-                                            {
-                                                dataRow[j] = str.ToString();
-                                            }
-                                            else
-                                            {
-                                                dataRow[j] = null;
-                                            }
+                                        case CellType.Error:
+                                            dataRow[j] = ErrorEval.GetText(row.GetCell(j).ErrorCellValue);
                                             break;
-                                        case CellType.Numeric:
+                                        case CellType.Boolean:
+                                            dataRow[j] = Convert.ToString(row.GetCell(j).BooleanCellValue);
+                                            break;
+                                        case CellType.Numeric://数字类
                                             if (DateUtil.IsCellDateFormatted(row.GetCell(j)))
                                             {
                                                 dataRow[j] = DateTime.FromOADate(row.GetCell(j).NumericCellValue);
@@ -844,15 +867,18 @@ namespace FileOperate.Excel
                                                 dataRow[j] = Convert.ToDouble(row.GetCell(j).NumericCellValue);
                                             }
                                             break;
-                                        case CellType.Boolean:
-                                            dataRow[j] = Convert.ToString(row.GetCell(j).BooleanCellValue);
-                                            break;
-                                        case CellType.Error:
-                                            dataRow[j] = ErrorEval.GetText(row.GetCell(j).ErrorCellValue);
-                                            break;
-                                        case CellType.Formula:
+                                        case CellType.Formula://公式计算类
                                             switch (row.GetCell(j).CachedFormulaResultType)
                                             {
+                                                case CellType.Error:
+                                                    dataRow[j] = ErrorEval.GetText(row.GetCell(j).ErrorCellValue);
+                                                    break;
+                                                case CellType.Boolean:
+                                                    dataRow[j] = Convert.ToString(row.GetCell(j).BooleanCellValue);
+                                                    break;
+                                                case CellType.Numeric:
+                                                    dataRow[j] = Convert.ToString(row.GetCell(j).NumericCellValue);
+                                                    break;
                                                 case CellType.String:
                                                     string strFORMULA = row.GetCell(j).StringCellValue.Trim();
                                                     if (strFORMULA != null && strFORMULA.Length > 0)
@@ -864,18 +890,20 @@ namespace FileOperate.Excel
                                                         dataRow[j] = null;
                                                     }
                                                     break;
-                                                case CellType.Numeric:
-                                                    dataRow[j] = Convert.ToString(row.GetCell(j).NumericCellValue);
-                                                    break;
-                                                case CellType.Boolean:
-                                                    dataRow[j] = Convert.ToString(row.GetCell(j).BooleanCellValue);
-                                                    break;
-                                                case CellType.Error:
-                                                    dataRow[j] = ErrorEval.GetText(row.GetCell(j).ErrorCellValue);
-                                                    break;
                                                 default:
                                                     dataRow[j] = "";
                                                     break;
+                                            }
+                                            break;
+                                        case CellType.String:
+                                            string str = row.GetCell(j).StringCellValue.Trim();
+                                            if (str != null && str.Length > 0)
+                                            {
+                                                dataRow[j] = str.ToString();
+                                            }
+                                            else
+                                            {
+                                                dataRow[j] = null;
                                             }
                                             break;
                                         default:
